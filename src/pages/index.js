@@ -1,0 +1,7 @@
+export { default as HomePage } from  './HomePage/HomePage'
+export { default as LikedProducts } from  './Likes/LikedProducts'
+export { default as Cart } from  './Cart/Cart'
+export { default as SearchProducts } from  './SearchProducts/SearchProducts'
+export { default as ProductDetail } from  './ProductDetails/ProductDetail'
+export { default as Login } from  './Login/Login'
+export { default as Register } from  './Register/Register'

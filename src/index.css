@@ -1,0 +1,19 @@
+body{
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar{
+  width: 4px; 
+  height:4px;
+}
+::-webkit-scrollbar-thumb{ 
+  background-color: #ED3729;
+  border-radius: .125rem; 
+}
+::-webkit-scrollbar-track{ 
+  background:transparent;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities; 
