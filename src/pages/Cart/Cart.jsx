@@ -1,22 +1,39 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useGetUserCartQuery } from "../../api/getApis"
 import { BiHeart, BiTrash } from "react-icons/bi"
 import { FaHeart } from "react-icons/fa"
 import { useSelector } from "react-redux"
 import { Loader } from "../../components"
 import { formatPrice } from "../../helper"
-
+import getUserInfo from "../../api/getUser"
 const Cart = () => {
   const { user } = useSelector(state => state.card)
-  const { cardStorage } = useSelector(state => state.card)
+  const [carts, setCarts] = useState()
   const [selectAll, setSelectAll] = useState(false)
   const { data, isFetching } = useGetUserCartQuery(user?.id)
-  if (isFetching) return <Loader />
-  const deleteProduct = id => {
-    const deletedData = useDeleleCartMutation(id)
-    console.log(deletedData)
+  const getCarts = async () => {
+    try {
+      const response = getUserInfo.getUserCarts(user?.id)
+      console.log(response)
+      setCarts(response)
+    } catch (error) {}
   }
-  console.log(data)
+  useEffect(() => {
+    getCarts()
+  }, [data])
+  if (isFetching) return <Loader />
+
+  const deleteProduct = id => {
+    try {
+      const response = getUserInfo.deleteCartProduct(id)
+      console.log(response)
+    } catch (error) {
+      console.log(error)
+    }
+    getCarts()
+  }
+
+  console.log(carts)
   return (
     <div className="mx-3 md:container md:mx-auto">
       <div className="flex flex-col lg:flex-row mt-5">
@@ -29,49 +46,41 @@ const Cart = () => {
             </div>
           </div>
           <ul className="w-full h-full mt-2  overflow-y-scroll p-2">
-            {cardStorage &&
-              data?.carts?.map(products =>
-                products?.products?.map(product => (
-                  <li className="flex items-center   rounded-md mb-3 px-2" key={product.id}>
-                    <div className="p-3 w-1/6">
-                      <div className=" w-32 h-32 bg-contain bg-no-repeat bg-center" style={{ backgroundImage: `url(${product.thumbnail})` }}></div>
-                    </div>
-                    <div className="w-3/6 flex flex-col flex-grow">
-                      <div className="flex justify-between flex-grow  my-2">
-                        <div className="flex flex-col">
-                          <h4 className="text-black font-semibold text-lg capitalize">{product.title}</h4>
-                          <p className="text-md font-normal text-social-color "> Narxi: {formatPrice(product.price * 12500)}</p>
-                        </div>
-                        <div className="flex flex-col justify-start">
-                          {selectAll ? (
-                            <>
-                              <input type="checkbox" className="w-4 h-4 border " checked />
-                            </>
-                          ) : (
-                            <>
-                              <input type="checkbox" className="w-4 h-4 border " />
-                            </>
-                          )}
-                        </div>
+            {data?.carts?.map(products =>
+              products?.products?.map(product => (
+                <li className="flex items-center   rounded-md mb-3 px-2" key={product.id}>
+                  <div className="p-3 w-1/6">
+                    <div className=" w-32 h-32 bg-contain bg-no-repeat bg-center" style={{ backgroundImage: `url(${product.thumbnail})` }}></div>
+                  </div>
+                  <div className="w-3/6 flex flex-col flex-grow">
+                    <div className="flex justify-between flex-grow  my-2">
+                      <div className="flex flex-col">
+                        <h4 className="text-black font-semibold text-lg capitalize">{product.title}</h4>
+                        <p className="text-md font-normal text-social-color "> Narxi: {formatPrice(product.price * 12500)}</p>
                       </div>
-                      <div className="flex justify-between">
-                        <div className="flex flex-col  ">
-                          <div className=" text-black border  border-neutral-300 rounded-lg">
-                            <button className=" outline-none border-none bg-transparent p-2 text-md"> - </button>
-                            <span className="p-2 text-md">{product.quantity}</span>
-                            <button className=" outline-none border-none bg-transparent p-2 text-md">+</button>
-                          </div>
-                        </div>
-                        <div className="flex gap-3  mt-4 ">
-                          <p className="text-lg font-semibold text-social-color cursor-pointer" onClick={() => deleteProduct(product.id)}>
-                            <BiTrash />
-                          </p>
-                        </div>
+                      <div className="flex flex-col justify-start">
+                        {selectAll ? (
+                          <>
+                            <input type="checkbox" className="w-4 h-4 border " checked />
+                          </>
+                        ) : (
+                          <>
+                            <input type="checkbox" className="w-4 h-4 border " />
+                          </>
+                        )}
                       </div>
                     </div>
-                  </li>
-                ))
-              )}
+                    <div className="flex justify-end">
+                      <div className="flex gap-3  mt-4 ">
+                        <p className="text-lg font-semibold text-social-color cursor-pointer" onClick={() => deleteProduct(product.id)}>
+                          <BiTrash />
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              ))
+            )}
           </ul>
         </div>
         <div className="rounded-lg bg-grey-50 px-4 py-5 col-span-1">

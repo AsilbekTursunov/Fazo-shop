@@ -32,7 +32,7 @@ const HomePage = () => {
         <div className="mt-4">
           <section className="text-gray-600 body-font">
             <div className="flex flex-wrap  justify-center ">
-              {data.products.slice(0, 10).map((product, index) => (
+              {data?.products?.slice(0, 10).map((product, index) => (
                 <Product product={product} info={true} key={index} />
               ))}
             </div>
@@ -58,7 +58,7 @@ const HomePage = () => {
         <div className="mt-4">
           <section className="text-gray-600 body-font">
             <div className="flex flex-wrap  justify-center ">
-              {data.products.slice(10, 20).map((product, index) => (
+              {data?.products?.slice(10, 20).map((product, index) => (
                 <Product product={product} info={true} key={index} />
               ))}
             </div>
@@ -77,7 +77,7 @@ const HomePage = () => {
           <div className="w-full lg:w-3/5 xl:w-2/3 2xl:w-3/4">
             <section className="text-gray-600 body-font">
               <div className="flex flex-wrap  justify-center ">
-                {data.products.slice(20, 28).map((product, index) => (
+                {data?.products?.slice(20, 28).map((product, index) => (
                   <Product product={product} info={false} key={index} />
                 ))}
               </div>

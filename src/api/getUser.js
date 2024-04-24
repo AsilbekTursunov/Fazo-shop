@@ -26,8 +26,21 @@ const getUserInfo = {
     return response
   },
   async getAuthor() {
-    const response = await axios.get("/auth/me")
+    const response = await axios.get("/user/me")
     return response
   },
+  async addCart(product) {
+    const response = axios.post("carts/add", product)
+    return response
+  },
+  async getUserCarts(id) {
+    const response = await axios.get(`carts/user/${id}`)
+    return response
+  },
+  async deleteCartProduct(id) {
+    const response = await axios.delete(`carts/${id}`)
+    return response
+  }
+  
 }
 export default getUserInfo

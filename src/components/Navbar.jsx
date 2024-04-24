@@ -6,21 +6,22 @@ import { TfiMenuAlt } from "react-icons/tfi"
 import Logo from "../assets/images/Frame.png"
 import { Link, useNavigate } from "react-router-dom"
 import { Loader, SideBar } from "../components"
-import { useGetAllCategoriesQuery } from "../api/getApis"
+import { useGetAllCategoriesQuery, useGetUserCartQuery } from "../api/getApis"
 // Icon
 import { IoIosArrowForward } from "react-icons/io"
 import { useSelector } from "react-redux"
 
 const Navbar = () => {
-  const { data, isFetching } = useGetAllCategoriesQuery()
+  const { isLogin, user } = useSelector(state => state.card)
+  const { data, isFetching1 } = useGetAllCategoriesQuery()
+  const { data: carts, isFetching2 } = useGetUserCartQuery(user?.id)
   const [toggleCategory, setToggleCategory] = useState(false)
   const [toggleSlider, setToggleSlider] = useState(false)
   const [back, setBack] = useState(false)
   const [cartToggle, setCartToggle] = useState(false)
   const [searchValue, setSearchValue] = useState("")
   const navigate = useNavigate()
-  const { isLogin, user } = useSelector(state => state.card)
-  if (isFetching) return <Loader />
+  if (isFetching1 && isFetching2) return <Loader />
   const searchByCategories = () => {
     if (searchValue.length > 0) {
       navigate(`/products/search?q=${searchValue}`)
@@ -31,7 +32,6 @@ const Navbar = () => {
       searchByCategories()
     }
   }) 
-  console.log(isLogin);
   return (
     <div>
       <nav className="mx-3 md:container md:mx-auto my-2">
@@ -61,9 +61,7 @@ const Navbar = () => {
           <div id="  personal pages" className=" gap-5 font-medium hidden  xl:flex">
             {isLogin ? (
               <>
-                <span className="w-12 h-12 rounded-[50%] bg-contain bg-center bg-no-repeat border-2 border-slate-700" style={{backgroundImage:`url(${user.image})`}}>
-                  
-              </span>
+                <span className="w-12 h-12 rounded-[50%] bg-contain bg-center bg-no-repeat border-2 border-slate-700" style={{ backgroundImage: `url(${user.image})` }}></span>
               </>
             ) : (
               <>
@@ -73,15 +71,10 @@ const Navbar = () => {
                 </Link>
               </>
             )}
-            <Link to={"/liked"} className="flex flex-col justify-center items-center relative">
-              <CiHeart className="text-2xl" />
-              <span>Favorites</span>
-              <span className="w-5 h-5 rounded-[50%] bg-main-color text-white p-2 absolute top-0 -right-1 flex items-center justify-center"></span>
-            </Link>
-            <Link to={"/cart"} className="flex flex-col justify-center items-center relative">
+            <Link to={isLogin ? "cart" : "login-page"} className="flex flex-col justify-center items-center relative">
               <SlBasket className="text-2xl" />
               <span>Cart</span>
-              <span className="w-5 h-5 rounded-[50%] bg-main-color text-white p-2 absolute top-0 -right-1 flex items-center justify-center"> </span>
+              <span className="w-5 h-5 rounded-[50%] bg-main-color text-white p-2 absolute top-0 -right-1 flex items-center justify-center">{carts?.carts[0]?.products?.length}</span>
             </Link>
           </div>
         </div>
@@ -92,7 +85,7 @@ const Navbar = () => {
             <span>Categories</span>
           </button>
           <ul className=" flex text-[16px] justify-between flex-grow font-medium items-center h-full  ml-10 overflow-y-scroll">
-            {data.slice(0, 9).map((item, index) => (
+            {data?.slice(0, 9)?.map((item, index) => (
               <li key={index}>
                 <a href="#" className=" text-black capitalize">
                   {item}
@@ -110,7 +103,7 @@ const Navbar = () => {
           <div className="md:container mx-auto h-full flex ">
             <div className="w-1/4">
               <ul className="flex flex-col gap-5 my-5">
-                {data.map((item, index) => (
+                {data?.map((item, index) => (
                   <li key={index} className="" onClick={() => setBack(prevState => !prevState)}>
                     <Link to="/" className="flex items-center justify-between">
                       <span className="text-black font-normal text-sm capitalize pl-5">{item}</span>

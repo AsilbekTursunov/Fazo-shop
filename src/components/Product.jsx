@@ -1,15 +1,21 @@
 import React, { useState } from "react"
 import { formatPrice } from "../helper"
 import { Link } from "react-router-dom"
-import { addCard, addLikes } from "../app/cardSlice.js"
+import getUserInfo from "../api/getUser"
 
 import { SlBasketLoaded } from "react-icons/sl"
 import { CiHeart } from "react-icons/ci"
-import { HiOutlineScale } from "react-icons/hi2"  
-import { useDispatch } from "react-redux"
+import { HiOutlineScale } from "react-icons/hi2"
+import { useDispatch, useSelector } from "react-redux"
+import { useGetUserCartQuery } from "../api/getApis"
+import Loader from "./Loader"
 const Product = ({ product, info }) => {
   const dispatch = useDispatch()
+  const { user } = useSelector(state => state.card)
+  const { data, isFetching } = useGetUserCartQuery(user?.id)
   const [disCountTime, setdisCountTime] = useState()
+
+  if (isFetching) return <Loader />
   const deadline = "2026-06-11"
   const getDisCount = (price, disCount) => {
     const disCountPrice = price - (disCount * price) / 100
@@ -29,14 +35,18 @@ const Product = ({ product, info }) => {
 
   setInterval(() => {
     setdisCountTime(getTimeRemaining(deadline))
-  }, 1000) 
-  const addCardStorage = id => {
-     
-  } 
-  const addLikedStorage = id => {
-     
+  }, 1000)
+  const addToCart = async id => { 
+    const products = {
+      userId: user.id,
+      products: [...data?.carts[0]?.products, { id: id, quantity: 1 }],
+    }
+    try {
+      const response = await getUserInfo.addCart(products)
+    } catch (error) {
+      console.log(error)
+    }
   }
-  
   return (
     <div className="p-2 w-[285px] flex-grow">
       <div className=" relative  border-2 border-gray-200 border-opacity-60 rounded-lg overflow-hidden p-2">
@@ -46,9 +56,9 @@ const Product = ({ product, info }) => {
         <div className="p-2  text-center">
           <h2 className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1 flex   items-center justify-between">
             {" "}
-            <span className=" text-grey-300 line-through text-xs ">{formatPrice(product.price*12500)} сум</span>
+            <span className=" text-grey-300 line-through text-xs ">{formatPrice(product.price * 12500)} сум</span>
             <span className=" w-[1px]  bg-gray-400 h-4 "></span>
-            <span className=" text-main font-semibold text-sm">{formatPrice(getDisCount((product.price*12500), product.discountPercentage.toFixed(0)))} сум</span>
+            <span className=" text-main font-semibold text-sm">{formatPrice(getDisCount(product.price * 12500, product.discountPercentage.toFixed(0)))} сум</span>
           </h2>
           <h1 className="title-font text-md font-semibold text-gray-900 mb-3 h-5">{product.title}</h1>
           {info ? (
@@ -79,12 +89,12 @@ const Product = ({ product, info }) => {
         </div>
         <div id="card-btn" className="flex justify-evenly   border-t border-gray-200 pt-4">
           <div>
-            <button type="button" className="text-xl hover:text-main font-black " onClick={() => addCardStorage(product.id)}>
+            <button type="button" className="text-xl hover:text-main font-black " onClick={() => addToCart(product.id)}>
               <SlBasketLoaded />
             </button>
           </div>
           <div className=" border-x-[1px] border-neutral-300 px-5">
-            <button type="button" className="text-xl hover:text-main  " onClick={() => addLikedStorage(product.id)}>
+            <button type="button" className="text-xl hover:text-main  ">
               <CiHeart />
             </button>
           </div>

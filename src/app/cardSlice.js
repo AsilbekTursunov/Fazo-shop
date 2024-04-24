@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { SetItem } from "../helper"
+import { GetItem, SetItem } from "../helper"
 const initialState = {
   cardStorage: JSON.parse(localStorage.getItem("cart")) ? JSON.parse(localStorage.getItem("cart")) : [],
   likedProducts: JSON.parse(localStorage.getItem("liked_products")) ? JSON.parse(localStorage.getItem("liked_products")) : [],
@@ -26,7 +26,8 @@ export const cardSlice = createSlice({
       state.isFetching = false
       state.isLogin = true
       state.user = action.payload
-      SetItem('token', state.user.token)
+      const token = GetItem("token")
+      SetItem("token", state.user.token ? state.user.token : token)
     },
     loginUserFailure: (state, action) => {
       state.isFetching = false

@@ -1,31 +1,25 @@
 import React, { useEffect, useState } from "react"
 import { Route, Routes } from "react-router-dom"
 import { Header, Navbar, Footer, Loader } from "./components"
-import { Cart, HomePage, LikedProducts, Login, ProductDetail, SearchProducts } from "./pages"
-import { GetItem } from "./helper"
+import { Cart, HomePage, LikedProducts, Login, ProductDetail, SearchProducts } from "./pages" 
 import { useDispatch } from "react-redux"
-import { loginUserFailure, loginUserSuccess } from "./app/cardSlice"
+import { loginUserFailure, loginUserSuccess, loginUserStart } from "./app/cardSlice"
+import getUserInfo from "./api/getUser" 
 function App() {
   const [count, setCount] = useState(0)
   const dispatch = useDispatch()
   useEffect(() => {
-    const token = GetItem("token")
-    if (token) {
-     const respose =  fetch("https://dummyjson.com/auth/me", {
-        method: "GET",
-        headers: {
-          Authorization: token ? `${token}` : null,
-        },
-      })
-        .then(data => data.json())
-        .then(data => {
-          dispatch(loginUserSuccess(data))
-          return data
+    const getUser = () => {
+      dispatch(loginUserStart())
+      try {
+        getUserInfo.getAuthor().then(data => {
+          dispatch(loginUserSuccess(data.data))
         })
-      console.log(respose);
-    } else {
-      dispatch(loginUserFailure())
+      } catch (error) {
+        dispatch(loginUserFailure())
+      }
     }
+    getUser()
   }, [])
   return (
     <div className=" font-full-main">

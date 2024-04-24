@@ -26,7 +26,7 @@ export const categoriesApi = createApi({
       query: () => createRequest(`/carts`),
     }),
     getUserCart: builder.query({
-      query: id => createRequest(`users/${id}/carts`),
+      query: id => createRequest(`carts/user/${id}`),
     }),
   }),
 })
